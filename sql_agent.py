@@ -19,7 +19,7 @@ import sqlite3
 import pandas as pd
 
 
-DB_FILE_PATH = 'airbnb.db'
+DB_FILE_PATH = 'working.db'
 
 
 class SqlQueryToolkit(SQLDatabaseToolkit):

@@ -1,32 +1,48 @@
 import os
-
+import pandas as pd
 import streamlit as st
 
 from sql_agent import get_sql_query_from_user_question, \
     get_db_data_with_sql_query
 from visualization import get_suggested_visualization_response_from_ai, \
     plot_visualization_for_user_question
-
+from helpers import save_to_sqlite
 
 # Streamlit page config
 st.set_page_config(
-    page_title="AirBnB DataDialog",
+    page_title="Free Forecaster",
     page_icon="",
     layout="wide"
 )
 
-st.title("Chat with your Airbnb Data")
+st.title("Forecast at will!")
+st.sidebar.title("Upload your Dataset")
+uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type=["csv"])
+df = pd.read_csv(uploaded_file)
+save_to_sqlite(df, "working.db", "working_table")
 
 # Taking open api key as user input
 openai_key_input_placeholder = st.empty()
-if 'is_api_key_set' not in st.session_state:
+if 'is_open_ai_api_key_set' not in st.session_state:
     openai_key = openai_key_input_placeholder.text_input(
         "OpenAI API Key", type="password")
     if openai_key:
         # Save the input into session state
-        st.session_state.is_api_key_set = True
+        st.session_state.is_open_ai_api_key_set = True
         os.environ['OPENAI_API_KEY'] = openai_key
         openai_key_input_placeholder.empty()
+    else:
+        st.stop()
+
+timegpt_key_input_placeholder = st.empty()
+if 'is_time_gpt_api_key_set' not in st.session_state:
+    time_gpt_api_key = timegpt_key_input_placeholder.text_input(
+        "TimeGPT API Key", type="password")
+    if time_gpt_api_key:
+        # Save the input into session state
+        st.session_state.is_time_gpt_api_key_set = True
+        os.environ['TIME_GPT_API_KEY'] = time_gpt_api_key
+        timegpt_key_input_placeholder.empty()
     else:
         st.stop()
 
